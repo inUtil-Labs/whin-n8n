@@ -5,14 +5,14 @@ export class WhinApi implements ICredentialType {
 
   displayName = 'Whin API';
 
-  documentationUrl = 'https://n8n.inutil-labs.com/wspout';
+  documentationUrl = 'https://api.inutil.info/wh2/n8n/wspout';
 
   properties: INodeProperties[] = [
     {
       displayName: 'Base URL',
       name: 'baseUrl',
       type: 'string',
-      default: 'https://n8n.inutil-labs.com/wspout',
+      default: 'https://api.inutil.info/wh2/n8n/wspout',
       required: true,
       description: 'Whin backend endpoint to send messages',
     },

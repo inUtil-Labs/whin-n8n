@@ -66,7 +66,7 @@ export class Whin implements INodeType {
 
     for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
       try {
-        const baseUrl = (credentials.baseUrl as string) || 'https://n8n.inutil-labs.com/wspout';
+        const baseUrl = (credentials.baseUrl as string) || 'https://api.inutil.info/wh2/n8n/wspout';
         const defaultToken = (credentials.token as string) || '';
         const tokenOverride = this.getNodeParameter('token', itemIndex, '') as string;
         const tokenToUse = tokenOverride || defaultToken;

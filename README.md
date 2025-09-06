@@ -2,7 +2,7 @@
 
 Custom n8n community node to send WhatsApp messages through Whin backend.
 
-- Endpoint (default): `https://n8n.inutil-labs.com/wspout`
+- Endpoint (default): `https://api.inutil.info/wh2/n8n/wspout`
 - Auth: token (header Authorization: Bearer <token> and body token field)
 
 ## Nodes
