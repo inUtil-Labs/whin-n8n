@@ -1,0 +1,58 @@
+{
+  "name": "@inutil-labs/n8n-nodes-whin",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.json && mkdir -p dist/nodes/Whin && cp src/nodes/Whin/whin.png dist/nodes/Whin/",
+    "dev": "tsc -w -p tsconfig.json",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write .",
+    "test": "vitest",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "n8n",
+    "community-nodes",
+    "n8n-community-node-package",
+    "whatsapp",
+    "whin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "type": "module",
+  "private": "false",
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "n8n": {
+    "nodes": [
+      "./dist/nodes/Whin/Whin.node.js"
+    ],
+    "credentials": [
+      "./dist/credentials/WhinApi.credentials.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.1",
+    "eslint": "^9.35.0",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "n8n-core": "^1.14.1",
+    "n8n-workflow": "^1.82.0"
+  }
+}
