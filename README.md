@@ -2,7 +2,7 @@
 
 Custom n8n community node to send WhatsApp messages through Whin backend.
 
-- Endpoint (default): `https://api.inutil.info/wh2/n8n/wspout`
+- Endpoint (fixed): `https://api.inutil.info/wh2/n8n/wspout`
 - Auth: token (header Authorization: Bearer <token> and body token field)
 
 ## Nodes
@@ -10,10 +10,10 @@ Custom n8n community node to send WhatsApp messages through Whin backend.
 - Whin: Send Message
   - Inputs: main
   - Outputs: main
-  - Credentials: Whin API (Base URL, Token)
+  - Credentials: Whin API (Token only)
   - Parameters:
     - Token Override (optional)
-    - WhatsApp Payload (JSON matching official WhatsApp node schema; token is added automatically)
+    - Content Payload (JSON for the WhatsApp content only; do not include envelope fields like `messaging_product`, `to`, or `context`)
 
 ## Development
 
@@ -24,16 +24,15 @@ npm run build
 
 Example usage in n8n:
 
-1) Create credentials "Whin API" with Base URL and Token.
+1) Create credentials "Whin API" with Token.
 2) Add node "Whin: Send Message".
-3) Set WhatsApp Payload (JSON) similar to official WhatsApp node, e.g.:
+3) Set Content Payload (JSON), e.g.:
 
 ```json
 {
-  "to": "<phone-number>",
   "type": "text",
   "text": { "body": "Hello from Whin" }
 }
 ```
 
-In n8n, install as a local community node and use the Whin API credentials.
+The node strips envelope fields if present and sends only the content to the Whin endpoint with your token.

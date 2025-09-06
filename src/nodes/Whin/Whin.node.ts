@@ -7,6 +7,8 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
+const WHIN_ENDPOINT = 'https://api.inutil.info/wh2/n8n/wspout';
+
 export class Whin implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Whin: Send Message',
@@ -49,11 +51,12 @@ export class Whin implements INodeType {
         description: 'Override credential token for this item',
       },
       {
-        displayName: 'WhatsApp Payload',
+        displayName: 'Content Payload',
         name: 'payload',
         type: 'json',
-        default: '{"to":"","type":"text","text":{"body":""}}',
-        description: 'Payload following official WhatsApp node schema, plus token support',
+        default: '{"type":"text","text":{"body":""}}',
+        description:
+          'WhatsApp content object only (e.g. text/template/image/etc.). Do not include envelope fields like messaging_product or to.',
       },
     ],
   };
@@ -66,12 +69,27 @@ export class Whin implements INodeType {
 
     for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
       try {
-        const baseUrl = (credentials.baseUrl as string) || 'https://api.inutil.info/wh2/n8n/wspout';
         const defaultToken = (credentials.token as string) || '';
         const tokenOverride = this.getNodeParameter('token', itemIndex, '') as string;
         const tokenToUse = tokenOverride || defaultToken;
 
-        const payload = this.getNodeParameter('payload', itemIndex, {}) as IDataObject;
+        let payloadParam = this.getNodeParameter('payload', itemIndex) as unknown;
+
+        // Accept string JSON or object
+        if (typeof payloadParam === 'string') {
+          try {
+            payloadParam = JSON.parse(payloadParam);
+          } catch (err) {
+            throw new Error('Payload must be valid JSON when provided as string');
+          }
+        }
+
+        const payload = { ...(payloadParam as IDataObject) };
+
+        // Strip envelope fields if present
+        delete (payload as IDataObject)['messaging_product'];
+        delete (payload as IDataObject)['to'];
+        delete (payload as IDataObject)['context'];
 
         const requestOptions = {
           headers: {
@@ -83,7 +101,7 @@ export class Whin implements INodeType {
             token: tokenToUse,
           },
           method: 'POST',
-          uri: baseUrl,
+          uri: WHIN_ENDPOINT,
           json: true,
         } as unknown as IDataObject;
 
