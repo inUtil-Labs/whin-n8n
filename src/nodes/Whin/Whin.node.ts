@@ -24,15 +24,17 @@ const ALLOWED_TYPES = new Set([
 
 export class Whin implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Whin: Send Message',
+    displayName: 'Whin',
     name: 'whin',
     icon: 'file:whin.png',
     group: ['output'],
     version: 1,
-    description: 'Send WhatsApp messages via Whin backend',
+    description: 'WhatsApp (self-send): send messages to your own WhatsApp via Whin. Search: whatsapp, whatsapp yourself, self whatsapp.',
     defaults: {
       name: 'Whin',
     },
+    // Hint for palette: surface WhatsApp explicitly in subtitle
+    subtitle: 'WhatsApp • send to yourself',
     inputs: [NodeConnectionType.Main],
     outputs: [NodeConnectionType.Main],
     credentials: [
