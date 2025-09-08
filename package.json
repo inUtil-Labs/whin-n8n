@@ -1,6 +1,6 @@
 {
   "name": "@inutil-labs/n8n-nodes-whin",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Whin: n8n node to send WhatsApp messages via Whin backend",
   "main": "dist/index.js",
   "scripts": {
