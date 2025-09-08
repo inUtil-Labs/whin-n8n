@@ -1,6 +1,7 @@
 {
   "name": "@inutil-labs/n8n-nodes-whin",
   "version": "0.1.0",
+  "description": "Whin: n8n node to send WhatsApp messages via Whin backend",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.json && mkdir -p dist/nodes/Whin && cp src/nodes/Whin/whin.png dist/nodes/Whin/",
@@ -17,13 +18,20 @@
     "whatsapp",
     "whin"
   ],
-  "author": "",
+  "author": "inUtil Labs",
   "license": "MIT",
-  "description": "",
   "private": "false",
   "engines": {
     "node": ">=18"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inUtil-Labs/whin-n8n.git"
+  },
+  "bugs": {
+    "url": "https://github.com/inUtil-Labs/whin-n8n/issues"
+  },
+  "homepage": "https://github.com/inUtil-Labs/whin-n8n#readme",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
@@ -41,12 +49,12 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.1",
     "eslint": "^9.35.0",
+    "n8n-workflow": "^1.80.0",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4",
-    "n8n-workflow": "^1.80.0"
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "n8n-core": ">=1.0.0",

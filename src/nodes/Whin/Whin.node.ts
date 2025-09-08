@@ -8,6 +8,19 @@ import type {
 import { NodeConnectionType } from 'n8n-workflow';
 
 const WHIN_ENDPOINT = 'https://api.inutil.info/wh2/n8n/wspout';
+const ALLOWED_TYPES = new Set([
+  'text',
+  'template',
+  'image',
+  'audio',
+  'video',
+  'document',
+  'sticker',
+  'contacts',
+  'location',
+  'interactive',
+  'reaction',
+]);
 
 export class Whin implements INodeType {
   description: INodeTypeDescription = {
@@ -54,9 +67,17 @@ export class Whin implements INodeType {
         displayName: 'Content Payload',
         name: 'payload',
         type: 'json',
-        default: '{"type":"text","text":{"body":""}}',
+        default: '{}',
         description:
-          'WhatsApp content object only (e.g. text/template/image/etc.). Do not include envelope fields like messaging_product or to.',
+          'WhatsApp content object only (e.g. {"type":"text","text":{"body":"hi"}}). Do not include envelope fields like messaging_product, to, or context.',
+      },
+      {
+        displayName: 'Request Timeout (ms)',
+        name: 'timeoutMs',
+        type: 'number',
+        typeOptions: { minValue: 1000 },
+        default: 10000,
+        description: 'Abort the request if it takes longer than this',
       },
     ],
   };
@@ -72,47 +93,78 @@ export class Whin implements INodeType {
         const defaultToken = (credentials.token as string) || '';
         const tokenOverride = this.getNodeParameter('token', itemIndex, '') as string;
         const tokenToUse = tokenOverride || defaultToken;
+        if (!tokenToUse) {
+          throw new Error('Missing token. Provide credentials or a Token Override.');
+        }
 
         let payloadParam = this.getNodeParameter('payload', itemIndex) as unknown;
+        const timeoutMs = this.getNodeParameter('timeoutMs', itemIndex, 10000) as number;
 
         // Accept string JSON or object
         if (typeof payloadParam === 'string') {
-          try {
-            payloadParam = JSON.parse(payloadParam);
-          } catch (err) {
-            throw new Error('Payload must be valid JSON when provided as string');
+          const trimmed = payloadParam.trim();
+          if (!trimmed) {
+            throw new Error('Content Payload is required.');
           }
+          try {
+            payloadParam = JSON.parse(trimmed);
+          } catch {
+            throw new Error('Content Payload must be valid JSON when provided as a string.');
+          }
+        }
+
+        if (payloadParam === null || typeof payloadParam !== 'object' || Array.isArray(payloadParam)) {
+          throw new Error('Content Payload must be a JSON object.');
         }
 
         const payload = { ...(payloadParam as IDataObject) };
 
-        // Strip envelope fields if present
+        // Strip envelope fields if present (safety)
         delete (payload as IDataObject)['messaging_product'];
         delete (payload as IDataObject)['to'];
         delete (payload as IDataObject)['context'];
+
+        // Basic validation: require a type and allow only supported types
+        const typeValue = (payload as IDataObject)['type'];
+        if (typeof typeValue !== 'string' || !ALLOWED_TYPES.has(typeValue)) {
+          throw new Error(
+            'Content Payload must include a valid "type" (text|template|image|audio|video|document|sticker|contacts|location|interactive|reaction).',
+          );
+        }
 
         const requestOptions = {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${tokenToUse}`,
+            'User-Agent': 'whin-n8n/0.1.0',
           },
           body: {
             ...payload,
+            // Keep token in body per backend contract; backend is authoritative recipient.
             token: tokenToUse,
           },
           method: 'POST',
           uri: WHIN_ENDPOINT,
           json: true,
+          timeout: timeoutMs,
         } as unknown as IDataObject;
 
         const responseData = await this.helpers.request(requestOptions);
-        returnData.push({ json: responseData as IDataObject });
+        // Ensure token is not leaked back
+        returnData.push({ json: (responseData as IDataObject) ?? {} });
       } catch (error) {
+        const err = error as IDataObject & { statusCode?: number; code?: string };
+        const safeError = {
+          message: (err.message as string) || 'Request failed',
+          statusCode: err.statusCode ?? (err as unknown as { response?: { statusCode?: number } }).response?.statusCode,
+          code: err.code,
+        } as IDataObject;
+
         if (this.continueOnFail()) {
-          returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: itemIndex } });
+          returnData.push({ json: safeError, pairedItem: { item: itemIndex } });
           continue;
         }
-        throw error;
+        throw new Error(`${safeError.statusCode ?? ''} ${safeError.message}`.trim());
       }
     }
 
