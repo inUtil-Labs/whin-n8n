@@ -1,6 +1,6 @@
 {
   "name": "@inutil-labs/n8n-nodes-whin",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "n8n node to send WhatsApp messages to yourself using a simple token (no Business Manager)",
   "main": "dist/index.js",
   "scripts": {
