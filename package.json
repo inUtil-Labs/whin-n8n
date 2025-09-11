@@ -1,0 +1,66 @@
+{
+  "name": "@inutil-labs/n8n-nodes-whin",
+  "version": "1.0.6",
+  "description": "n8n node to send WhatsApp messages to yourself using a simple token (no Business Manager)",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.json && mkdir -p dist/nodes/Whin && cp src/nodes/Whin/whin.png dist/nodes/Whin/",
+    "dev": "tsc -w -p tsconfig.json",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write .",
+    "test": "vitest",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "n8n",
+    "community-nodes",
+    "n8n-community-node-package",
+    "whatsapp",
+    "whatsapp-cloud",
+    "alerts",
+    "notifications",
+    "whin"
+  ],
+  "author": "inUtil Labs",
+  "license": "MIT",
+  "private": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inUtil-Labs/whin-n8n.git"
+  },
+  "bugs": {
+    "url": "https://github.com/inUtil-Labs/whin-n8n/issues"
+  },
+  "homepage": "https://github.com/inUtil-Labs/whin-n8n#readme",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "n8n": {
+    "nodes": [
+      "./dist/nodes/Whin/Whin.node.js"
+    ],
+    "credentials": [
+      "./dist/credentials/WhinApi.credentials.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.1",
+    "eslint": "^9.35.0",
+    "n8n-workflow": "^1.80.0",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "n8n-core": ">=1.0.0",
+    "n8n-workflow": ">=1.0.0"
+  }
+}
